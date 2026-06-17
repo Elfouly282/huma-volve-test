@@ -7,7 +7,7 @@ class SplachScreen extends StatelessWidget {
     return const Scaffold(
       body: Column(
         children: [
-
+ // edit
         ],
       ),
     );
