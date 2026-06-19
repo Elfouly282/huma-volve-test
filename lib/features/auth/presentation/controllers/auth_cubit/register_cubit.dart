@@ -1,5 +1,4 @@
-
-import 'package:flutter_bloc/flutter_bloc.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test1/features/auth/domain/use_cases/register_use_case.dart';
 import 'package:test1/features/auth/presentation/controllers/auth_cubit/register_state.dart';
 
