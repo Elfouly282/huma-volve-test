@@ -1,7 +1,7 @@
 
 import 'package:test1/features/auth/domain/entities/user_entity.dart';
 
-class UserModel extends UserEntity {
+ class UserModel extends UserEntity {
   const UserModel({
     required super.id,
     required super.username,
@@ -21,16 +21,5 @@ class UserModel extends UserEntity {
       createdAt: user['created_at'] as String,
       token: json['token'] as String,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'username': username,
-      'email': email,
-      'phone': phone,
-      'created_at': createdAt,
-      'token': token,
-    };
   }
 }

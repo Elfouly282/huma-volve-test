@@ -1,4 +1,4 @@
-class UserEntity {
+ class UserEntity {
   final int id;
   final String username;
   final String email;

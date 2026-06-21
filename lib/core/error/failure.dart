@@ -1,36 +1,42 @@
 import 'package:dio/dio.dart';
- abstract class Failure {
-  final String errorMessage;
 
-  Failure(this.errorMessage);
+abstract class Failure {
+  final String message;
+  const Failure(this.message);
 }
 
 class ServerFailure extends Failure {
-  ServerFailure(super.errorMessage);
+  const ServerFailure(super.message);
 
-  factory ServerFailure.fromDioError(DioException dioError) {
-    switch (dioError.type) {
+  factory ServerFailure.fromDioError(DioException error) {
+    switch (error.type) {
       case DioExceptionType.connectionTimeout:
-        return ServerFailure('Connection to the server timed out. Please check your internet connection.');
-
+        return const ServerFailure(
+          'Connection timeout with the server, please try again',
+        );
       case DioExceptionType.sendTimeout:
-        return ServerFailure('Failed to send data. Please try again.');
-
+        return const ServerFailure(
+          'Send timeout with the server, please try again',
+        );
       case DioExceptionType.receiveTimeout:
-        return ServerFailure('Failed to receive data. Please try again.');
-
+        return const ServerFailure(
+          'Receive timeout with the server, please try again',
+        );
+      case DioExceptionType.badCertificate:
+        return const ServerFailure('Bad certificate, please try again');
       case DioExceptionType.badResponse:
         return ServerFailure.fromResponse(
-            dioError.response?.statusCode, dioError.response?.data);
-
+          error.response?.statusCode,
+          error.response?.data,
+        );
       case DioExceptionType.cancel:
-        return ServerFailure('The request was canceled. Please try again.');
-
+        return const ServerFailure('Request was cancelled, please try again');
+      case DioExceptionType.connectionError:
+        return const ServerFailure(
+          'No internet connection, please check and try again',
+        );
       case DioExceptionType.unknown:
-        return ServerFailure('No internet connection. Please check your network.');
-
-      default:
-        return ServerFailure('An unexpected error occurred. Please try again.');
+        return const ServerFailure('Something went wrong, please try again');
     }
   }
 
@@ -38,14 +44,27 @@ class ServerFailure extends Failure {
     if (statusCode == 400 ||
         statusCode == 401 ||
         statusCode == 403 ||
+        statusCode == 404 ||
         statusCode == 422) {
-      return ServerFailure('There was an issue with the data you entered. Please check and try again.');
-    } else if (statusCode == 404) {
-      return ServerFailure('The requested page or resource was not found.');
+      try {
+        final data = response as Map<String, dynamic>;
+
+        final errors = data['errors'];
+        if (errors is Map && errors.isNotEmpty) {
+          final firstError = errors.values.first;
+          if (firstError is List && firstError.isNotEmpty) {
+            return ServerFailure(firstError.first.toString());
+          }
+        }
+
+        return ServerFailure(data['message']?.toString() ?? 'Request failed');
+      } catch (_) {
+        return const ServerFailure('Request failed, please try again');
+      }
     } else if (statusCode == 500) {
-      return ServerFailure('Internal server error. Please try again later.');
+      return const ServerFailure('Internal server error, please try later');
     } else {
-      return ServerFailure('An unexpected error occurred. Please try again.');
+      return const ServerFailure('Something went wrong, please try again');
     }
   }
 }

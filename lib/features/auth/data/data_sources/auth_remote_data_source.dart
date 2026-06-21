@@ -1,43 +1,23 @@
-
 import 'package:dio/dio.dart';
 import 'package:test1/core/constants/api_constants.dart';
-import 'package:test1/features/auth/data/models/user_model.dart';
+import 'package:test1/features/auth/data/models/auth_response_model.dart';
+import 'package:test1/features/auth/data/models/register_request_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<UserModel> register({
-    required String username,
-    required String email,
-    required String phone,
-    required String password,
-    required String passwordConfirmation,
-  });
+  Future<AuthResponseModel> register(RegisterRequestModel request);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final Dio dio;
+  final Dio _dio;
 
-  AuthRemoteDataSourceImpl(this.dio);
+  const AuthRemoteDataSourceImpl(this._dio);
 
   @override
-  Future<UserModel> register({
-    required String username,
-    required String email,
-    required String phone,
-    required String password,
-    required String passwordConfirmation,
-  }) async {
-    final response = await dio.post(
-      ApiConstants.baseUrl + ApiConstants.register,
-      data: {
-        "username": username,
-        "email": email,
-        "phone": phone,
-        "password": password,
-        "password_confirmation": passwordConfirmation,
-        "agree_terms": 1,
-      },
+  Future<AuthResponseModel> register(RegisterRequestModel request) async {
+    final response = await _dio.post(
+      ApiConstants.register,
+      data: request.toJson(),
     );
-
-    return UserModel.fromJson(response.data['data'] as Map<String, dynamic>);
+    return AuthResponseModel.fromJson(response.data as Map<String, dynamic>);
   }
 }

@@ -3,25 +3,13 @@ import 'package:dartz/dartz.dart';
 import 'package:test1/core/error/failure.dart';
 import 'package:test1/features/auth/domain/entities/user_entity.dart';
 import 'package:test1/features/auth/domain/repos/auth_repo.dart';
+import 'package:test1/features/auth/domain/use_cases/register_params.dart';
 
-class RegisterUseCase {
-  final AuthRepo authRepo;
+  class RegisterUseCase {
+  final AuthRepository _repository;
 
-  RegisterUseCase(this.authRepo);
+  const RegisterUseCase(this._repository);
 
-  Future<Either<Failure, UserEntity>> call({
-    required String username,
-    required String email,
-    required String phone,
-    required String password,
-    required String passwordConfirmation,
-  }) {
-    return authRepo.register(
-      username: username,
-      email: email,
-      phone: phone,
-      password: password,
-      passwordConfirmation: passwordConfirmation,
-    );
-  }
+  Future<Either<Failure, UserEntity>> call(RegisterParams params) =>
+      _repository.register(params);
 }
