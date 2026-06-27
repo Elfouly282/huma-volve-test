@@ -1,13 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:test1/core/error/failure.dart';
 import 'package:test1/features/auth/data/datasource/remote/remote_repository.dart';
+import 'package:test1/features/auth/data/model/register_request_model.dart';
+import 'package:test1/features/auth/domain/entity/register_entity.dart';
 import 'package:test1/features/auth/domain/entity/user_entity.dart';
-import '../../../../core/error/failure.dart';
-import '../../data/model/register_request_model.dart';
-
-abstract class AuthRepository {
-  Future<Either<Failure, UserEntity>> register(RegisterRequestModel request);
-}
+import 'package:test1/features/auth/domain/repository/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -16,22 +14,31 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, UserEntity>> register(
-    RegisterRequestModel request,
+    RegisterRequestEntity request,
   ) async {
     try {
-      final response = await remoteDataSource.register(request);
-
-      final user = UserEntity(
-        id: response.user.id,
-        username: response.user.username,
-        email: response.user.email,
-        phone: response.user.phone,
-        createdAt: response.user.createdAt,
+      final response = await remoteDataSource.register(
+        RegisterRequestModel(
+          username: request.username,
+          email: request.email,
+          phone: request.phone,
+          password: request.password,
+          passwordConfirmation: request.passwordConfirmation,
+          agreeTerms: request.agreeTerms,
+        ),
       );
 
-      return Right(user);
+      return Right(
+        UserEntity(
+          id: response.user.id,
+          username: response.user.username,
+          email: response.user.email,
+          phone: response.user.phone,
+          createdAt: response.user.createdAt,
+        ),
+      );
     } on DioException catch (e) {
-      return Left(ServerFailure(e.response?.data['message'] ?? 'Error'));
+      return Left(NetworkFailure(e.toString()));
     }
   }
 }

@@ -13,8 +13,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<RegisterResponseModel> register(RegisterRequestModel request) async {
-    final response = await dio.post('/auth/register', data: request.toJson());
+    try {
+      final response = await dio.post('/auth/register', data: request.toJson());
 
-    return RegisterResponseModel.fromJson(response.data);
+      return RegisterResponseModel.fromJson(response.data);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+
+      if (data != null) {
+        return RegisterResponseModel.fromJson(data);
+      }
+
+      throw Exception(e.message);
+    }
   }
 }

@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failure.dart';
-import '../entity/user_entity.dart';
-import '../../data/model/register_request_model.dart';
+import 'package:test1/core/error/failure.dart';
+import 'package:test1/features/auth/domain/entity/register_entity.dart';
+import 'package:test1/features/auth/domain/entity/user_entity.dart';
 
 abstract class AuthRepository {
-  Future<Either<Failure, UserEntity>> register(RegisterRequestModel request);
+  Future<Either<Failure, UserEntity>> register(RegisterRequestEntity entity);
 }

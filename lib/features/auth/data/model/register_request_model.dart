@@ -1,10 +1,10 @@
 class  RegisterRequestModel {
-  String username;
-  String email;
-  String phone;
-  String password;
-  String passwordConfirmation;
-  int agreeTerms;
+ final  String username;
+ final  String email;
+ final  String phone;
+ final  String password;
+ final  String passwordConfirmation;
+  final int agreeTerms;
 
    RegisterRequestModel({
     required this.username,
